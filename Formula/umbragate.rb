@@ -5,11 +5,11 @@ class Umbragate < Formula
 
   on_macos do
     if Hardware::CPU.arm?
-      url "https://github.com/jachy-h/umbra-gate/releases/download/v0.8.0/umbragate_Darwin_arm64.tar.gz"
-      sha256 "7188ca62233f4ab8483faa1c6c85a53499a9831520bea5f3556b2ecec0eca3e3"
+      url "https://github.com/jachy-h/umbra-gate/releases/download/v0.8.1/umbragate_Darwin_arm64.tar.gz"
+      sha256 "36c8d16cb17b004c63614667e5b9daebd0597fb09acd0c65ef25a38e35310968"
     else
-      url "https://github.com/jachy-h/umbra-gate/releases/download/v0.8.0/umbragate_Darwin_x86_64.tar.gz"
-      sha256 "943a78d2abe6474fb3873e817d1bb00b9bef13ca78ccf69f7de088e4086689a6"
+      url "https://github.com/jachy-h/umbra-gate/releases/download/v0.8.1/umbragate_Darwin_x86_64.tar.gz"
+      sha256 "9c32eaf1ff414d83c04d65dce74801caab98292f5a5cb6b847b55df7fe735f20"
     end
   end
 
