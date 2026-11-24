@@ -22,6 +22,17 @@ Install Umbragate:
 brew install umbragate
 ```
 
+Install Lan Copy (macOS Apple Silicon; other platforms are not packaged yet):
+
+```bash
+brew install lan-copy
+brew services start lan-copy   # run the LAN server in the background
+```
+
+Lan Copy serves the web UI on <http://localhost:8080> after startup. Homebrew
+only ships the Apple Silicon build: Intel Macs and Linux are rejected by the
+formula instead of installing an unverified binary.
+
 macOS GUI applications are distributed as casks. When the first one is
 published, it is installed with:
 
@@ -38,7 +49,11 @@ are `.app`, DMG or PKG bundles.
 brew update
 brew upgrade             # every package from this tap
 brew upgrade umbragate   # a single package
+brew upgrade lan-copy    # a single package
 ```
+
+Use `brew upgrade lan-copy` instead of the in-app updater: the app's updater
+replaces files inside the Homebrew Cellar, while Homebrew owns those paths.
 
 ## Uninstall
 
@@ -47,6 +62,13 @@ Formula:
 ```bash
 brew services stop umbragate   # only if you enabled the background service
 brew uninstall umbragate
+```
+
+Lan Copy:
+
+```bash
+brew services stop lan-copy    # only if you started the service
+brew uninstall lan-copy
 ```
 
 Cask:
@@ -59,13 +81,15 @@ brew uninstall --zap --cask <app-name>   # also remove app support and settings
 Some packages keep data outside Homebrew's prefix. For Umbragate, configuration
 and the local database live in `~/.umbragate/` and are intentionally left in
 place by `brew uninstall`. Delete that directory manually if you want a clean
-slate.
+slate. A Lan Copy service started with `brew services` keeps its shared folder
+in `$(brew --prefix)/var/lan-copy`, which `brew uninstall` also leaves behind.
 
 ## Available Packages
 
 | Package     | Type    | Description                                                 | Install                  | Source                                                      |
 | ----------- | ------- | ----------------------------------------------------------- | ------------------------ | ----------------------------------------------------------- |
 | `umbragate` | Formula | Local-first LLM gateway with dashboard and provider routing | `brew install umbragate` | [jachy-h/umbra-gate](https://github.com/jachy-h/umbra-gate) |
+| `lan-copy`  | Formula | Zero-dependency LAN file and text sharing tool              | `brew install lan-copy`  | [jachy-h/lan-copy](https://github.com/jachy-h/lan-copy)     |
 
 No casks are published yet. The table only lists packages that actually exist in
 this repository.
