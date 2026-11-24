@@ -1,4 +1,4 @@
-class LanCopy < Formula
+class Lancopy < Formula
   desc "Zero-dependency LAN file and text sharing tool"
   homepage "https://github.com/jachy-h/lan-copy"
   url "https://github.com/jachy-h/lan-copy/releases/download/v0.15.0-build1/Lan-Copy-macOS-Apple-Silicon.tar.gz"
@@ -9,30 +9,30 @@ class LanCopy < Formula
   depends_on :macos
 
   def install
-    bin.install "lan-copy"
+    bin.install "lan-copy" => "lancopy"
   end
 
   service do
-    run [opt_bin/"lan-copy", "-dir", var/"lan-copy"]
+    run [opt_bin/"lancopy", "-dir", var/"lancopy"]
     keep_alive true
     working_dir var
-    log_path var/"log/lan-copy.log"
-    error_log_path var/"log/lan-copy.log"
+    log_path var/"log/lancopy.log"
+    error_log_path var/"log/lancopy.log"
   end
 
   def caveats
     <<~EOS
       Start in the background:
-        brew services start lan-copy
+        brew services start lancopy
 
       Then open http://localhost:8080
 
       Upgrade with Homebrew rather than the in-app updater, which would replace
       files inside the Homebrew Cellar:
-        brew upgrade lan-copy
+        brew upgrade lancopy
 
       Run in the foreground with your own directory:
-        lan-copy -dir ~/共享文件夹-lancopy
+        lancopy -dir ~/共享文件夹-lancopy
     EOS
   end
 
@@ -40,7 +40,7 @@ class LanCopy < Formula
     port = free_port
     (testpath/"share").mkpath
     pid = fork do
-      exec bin/"lan-copy", "-listen", "127.0.0.1:#{port}", "-dir", testpath/"share"
+      exec bin/"lancopy", "-listen", "127.0.0.1:#{port}", "-dir", testpath/"share"
     end
 
     begin

@@ -9,7 +9,8 @@
 - 唯一职责是 **软件分发**：Formula、Cask、安装说明、版本更新与相关自动化。
 - 每个软件都维护在独立源码仓库中（例如 Umbragate 在 `jachy-h/umbra-gate`）。
   本仓库不承载软件主体源码、构建脚本或前端资源。
-- 当前包含两个真实软件包：`umbragate` 与 `lan-copy`（均为 Formula）。不要虚构软件、版本、下载地址或 SHA256。
+- 当前包含两个真实软件包：`umbragate` 与 `lancopy`（均为 Formula）。不要虚构软件、版本、下载地址或 SHA256。
+  `lancopy` 安装后提供 `lancopy` 命令；发布包内的二进制仍叫 `lan-copy`，由公式重命名。
 
 ## Repository Architecture
 
@@ -91,7 +92,7 @@ README.md
   `HOMEBREW_TAP_TOKEN` Secret 检出并推送本仓库。
 - Lan Copy 的自动更新由上游 `jachy-h/lan-copy` 的 `.github/workflows/release.yml`
   （`homebrew` job）完成：从 Release 的 `SHA256SUMS` 取 macOS Apple Silicon 归档校验值，
-  只改写 `Formula/lan-copy.rb` 的 `url` 与 `sha256`，推送前在本机 Tap 上执行
+  只改写 `Formula/lancopy.rb` 的 `url` 与 `sha256`，推送前在本机 Tap 上执行
   `brew style` 与 `brew audit --strict --online`，同样使用 `HOMEBREW_TAP_TOKEN`。
   该公式只支持 macOS Apple Silicon，`license` 依赖上游仓库的 MIT `LICENSE`。
 - 本仓库的 `.github/workflows/validate.yml` 只做只读校验：`permissions: contents: read`，
