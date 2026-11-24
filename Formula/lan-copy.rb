@@ -1,8 +1,8 @@
 class LanCopy < Formula
   desc "Zero-dependency LAN file and text sharing tool"
   homepage "https://github.com/jachy-h/lan-copy"
-  url "https://github.com/jachy-h/lan-copy/releases/download/v0.8.1/Lan-Copy-macOS-Apple-Silicon.tar.gz"
-  sha256 "fe6cb38a213708405f9051c78f17bbca426053397003862953757eee001c9f37"
+  url "https://github.com/jachy-h/lan-copy/releases/download/v0.15.0-build1/Lan-Copy-macOS-Apple-Silicon.tar.gz"
+  sha256 "c3f9587382b99cba9e7b66e12b14afe2c6f2417bcce39cb196803eb986ab25e9"
   license "MIT"
 
   depends_on arch: :arm64
