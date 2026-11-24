@@ -1,0 +1,129 @@
+name: validate
+
+# Validation only: this workflow never writes to the repository and needs no
+# secrets. Formula/Cask updates are handled by the upstream release workflows.
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: validate-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  definitions:
+    name: Formula and Cask validation
+    runs-on: macos-latest
+    timeout-minutes: 20
+    env:
+      HOMEBREW_NO_AUTO_UPDATE: "1"
+      HOMEBREW_NO_ANALYTICS: "1"
+      HOMEBREW_NO_ENV_HINTS: "1"
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+
+      - name: Check Ruby syntax
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          count=0
+          for file in Formula/*.rb Casks/*.rb; do
+            ruby -c "$file"
+            count=$((count + 1))
+          done
+          if [ "$count" -eq 0 ]; then
+            echo "::error::No Formula or Cask definitions found."
+            exit 1
+          fi
+
+      - name: Check tap layout
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          status=0
+          for file in Formula/*.rb Casks/*.rb; do
+            name="${file##*/}"
+            name="${name%.rb}"
+            if [[ ! "$name" =~ ^[a-z0-9][a-z0-9+@._-]*$ ]]; then
+              echo "::error file=$file::Use a lowercase Homebrew token."
+              status=1
+            fi
+          done
+          for dir in Formula Casks; do
+            [ -d "$dir" ] || continue
+            while IFS= read -r nested; do
+              echo "::error file=$nested::Move definition into $dir/ root."
+              status=1
+            done < <(find "$dir" -mindepth 2 -name '*.rb')
+          done
+          exit "$status"
+
+      - name: Check checksum requirements
+        run: |
+          set -euo pipefail
+          pattern='^[[:space:]]*sha256[[:space:]]+"?[[:space:]]*:no_check'
+          if grep -rInE --include='*.rb' "$pattern" Formula; then
+            echo "::error::Formula definitions must use a real sha256 checksum."
+            exit 1
+          fi
+          echo "All formulae pin a sha256 checksum."
+
+      - name: Register workspace as a Homebrew tap
+        run: |
+          set -euo pipefail
+          owner="${GITHUB_REPOSITORY%%/*}"
+          repo="${GITHUB_REPOSITORY#*/}"
+          tap="${owner}/${repo#homebrew-}"
+          tap_root="$(brew --repository)/Library/Taps"
+          tap_dir="${tap_root}/${owner}/homebrew-${repo#homebrew-}"
+          mkdir -p "$(dirname "$tap_dir")"
+          ln -sfn "$GITHUB_WORKSPACE" "$tap_dir"
+          brew trust --tap "$tap"
+          echo "TAP_NAME=$tap" >> "$GITHUB_ENV"
+
+      - name: Audit formulae
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          count=0
+          for file in Formula/*.rb; do
+            name="${file##*/}"
+            name="${name%.rb}"
+            brew audit --strict --online --formula "${TAP_NAME}/${name}"
+            count=$((count + 1))
+          done
+          if [ "$count" -eq 0 ]; then
+            echo "No formulae to audit."
+          fi
+
+      - name: Audit casks
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          count=0
+          for file in Casks/*.rb; do
+            name="${file##*/}"
+            name="${name%.rb}"
+            brew audit --strict --online --cask "${TAP_NAME}/${name}"
+            count=$((count + 1))
+          done
+          if [ "$count" -eq 0 ]; then
+            echo "No casks to audit."
+          fi
+
+      - name: Style check
+        run: |
+          set -euo pipefail
+          for dir in Formula Casks; do
+            [ -d "$dir" ] || continue
+            brew style "$dir"
+          done

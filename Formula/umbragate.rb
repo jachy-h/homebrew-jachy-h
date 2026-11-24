@@ -1,7 +1,6 @@
 class Umbragate < Formula
   desc "Local-first LLM gateway with dashboard and provider routing"
   homepage "https://github.com/jachy-h/umbra-gate"
-  version "0.8.0"
   license "MIT"
 
   on_macos do
