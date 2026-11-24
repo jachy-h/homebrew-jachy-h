@@ -46,7 +46,7 @@ class LanCopy < Formula
     begin
       20.times do
         sleep 0.5
-        break if system("curl", "-fsS", "http://127.0.0.1:#{port}/healthz", out: File::NULL, err: File::NULL)
+        break if quiet_system("curl", "-fsS", "-o", File::NULL, "http://127.0.0.1:#{port}/healthz")
       end
       assert_equal "ok", shell_output("curl -fsS http://127.0.0.1:#{port}/healthz").strip
       app = JSON.parse(shell_output("curl -fsS http://127.0.0.1:#{port}/api/app"))
