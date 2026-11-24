@@ -9,7 +9,7 @@ class LanCopy < Formula
   depends_on :macos
 
   def install
-    bin.install "Lan-Copy-macOS-arm64/lan-copy"
+    bin.install "lan-copy"
   end
 
   service do
